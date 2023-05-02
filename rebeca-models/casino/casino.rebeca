@@ -1,0 +1,156 @@
+reactiveclass Casino(5){
+   knownrebecs {
+     CasinoOwner owner;
+	 Player player;
+   }
+   statevars{
+     int balance;
+	 int betValue;
+	 boolean coinResult;
+	 boolean guessedValue;
+	 int state;
+	 int gameStopped;
+	 int gameStarted;
+	 int BetPlaced;
+	 int wAmount;
+	 int dAmount;
+   }
+   Casino(int startBalance ){
+     balance = startBalance;
+	 betValue = 0;
+	 gameStopped = 0;
+	 gameStarted = 1;
+	 BetPlaced = 2;
+	 coinResult = false;
+	 state = gameStopped;
+   }
+   msgsrv withdraw(int amount){
+     if(state != gameStopped){
+      int minBet;
+	  wAmount = amount;
+	  minBet = 18*betValue/10;
+	   if(balance >= minBet + amount )
+	    balance -= amount;
+     }
+     else{
+      if(balance >= amount) 
+	   balance -= amount;
+     }
+     owner.doSomething();
+   }
+   msgsrv deposit(int amount){
+     dAmount = amount;
+	 balance += amount;
+	 owner.doSomething();
+   }
+   msgsrv tossACoin(){
+     if(state == gameStopped){
+      coinResult = ?(false,true);
+	  state = gameStarted;
+	  owner.doSomething();
+     }
+   }
+   msgsrv endTheGame(){
+     if(state == BetPlaced){
+      if(guessedValue == coinResult)
+       transferReward(18*betValue/10);
+	  state = gameStopped;
+     }
+     owner.doSomething();
+    }
+   boolean transferReward(int value){
+     if(value <= balance){
+      player.receiveMoney(value);
+	  owner.withdrawReward(value);
+	  return true;
+	  //@event........
+     }	
+     return false;
+   }
+   msgsrv placeBet(int value , boolean guess){
+     if(state == gameStarted){
+      betValue = value;
+	  state = BetPlaced;
+	  guessedValue = guess;
+	  player.withdrawMoney(value);
+	  balance += value;
+     }
+	 else
+	  player.doSomething();
+   }	
+}
+reactiveclass Player(3){
+   knownrebecs {
+     Casino casino;
+   }  
+   statevars{
+     int balance;
+   }
+   Player(int startBalance){
+     balance = startBalance;
+	 self.doSomething();
+   }
+   msgsrv receiveMoney(int value){
+     balance += value;
+	 self.doSomething();
+   }
+   msgsrv withdrawMoney(int value){
+     if (balance > value ){
+      balance -= value;
+     }
+	 self.doSomething();
+   }
+   msgsrv doNothing(){
+     self.doSomething();
+   }
+   msgsrv doSomething(){
+     boolean betOrNot = (?(1,2,3)==2);
+	 int betValue;
+	 betValue = ?(10,15);
+	 boolean guess = ?(true,false);
+	  if(betOrNot && betValue <= balance){
+	   casino.placeBet(betValue, guess);
+	  }
+	  else{
+	   self.doNothing();
+	  }
+   }
+}
+ 
+reactiveclass CasinoOwner(3){
+   knownrebecs{
+     Casino casino;
+   }
+   statevars{
+     int balance;
+   }
+   CasinoOwner(int startBalance){
+     balance = startBalance;
+	 self.doSomething();
+   }
+   msgsrv doSomething(){
+     int whatToDo = ?(1,2,3,4);
+	 int randomValue = ?(20,30);
+	 if(whatToDo==1)
+	  casino.deposit(randomValue);
+	 else if(whatToDo==2)
+	  casino.withdraw(randomValue);
+	 else if(whatToDo==3)
+	  casino.tossACoin();
+	 else if(whatToDo==4)
+	  casino.endTheGame();
+   }
+   msgsrv receiveMoney(int value){
+     balance += value;
+   }
+   msgsrv withdrawReward(int value){
+    balance -= value;
+   }
+}
+
+main{
+   Casino casino(owner,player):(1000);
+   CasinoOwner owner(casino):(100);
+   Player player(casino):(20);
+}
+

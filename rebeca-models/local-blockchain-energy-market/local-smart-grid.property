@@ -1,0 +1,20 @@
+property {
+   define {
+     consumerPaid = market.paid;
+     marketStatus = market.status;
+	 modifiedAccount = market.modified;
+	 equalEnergyAllocation = (market.tBuy == market.bBuy);
+	 rMTHB = (market.requiredTokenB > (market.tokenForSale/2));
+	 rMTHT = (market.requiredTokenT > (market.tokenForSale/2));
+	 aliceOverSelling = ((market.tBuy + market.bBuy) > market.tokenForSale);
+   }
+   Assertion {
+     a1: (!(rMTHB && rMTHT ) || (equalEnergyAllocation) );     
+   }
+   LTL {
+     Safety: G (!(consumerPaid) || U (marketStatus, modifiedAccount));
+	 Progress: G (!marketStatus || F (marketStatus));
+	 NoStarvation: F (modifiedAccount);
+	 Safety2 : F (!aliceOverSelling);
+    }
+}

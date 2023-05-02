@@ -1,0 +1,10 @@
+property { 
+   define{
+     asset1Deliverd = asset1.deliverd;
+	 asset2Deliverd = asset2.deliverd;
+	 asset3Deliverd = asset3.deliverd;
+   }
+   LTL{
+     NoStarvation: F (asset1Deliverd) && F (asset2Deliverd) && F (asset3Deliverd);
+   }
+}

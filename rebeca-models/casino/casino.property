@@ -1,0 +1,19 @@
+property {
+   define { 
+     stateStart = casino.gameStarted == 1;
+     stateStop = casino.gameStopped == 0; 
+     wAmountLTZ = casino.wAmount < 0;
+     dAmountLTZ = casino.dAmount < 0;
+   }
+   Assertion {
+     a1 :casino.balance > (18*casino.betValue)/10;
+     //"balance underflow"
+	 a2 : casino.wAmount < casino.balance;
+     //balance overflow
+     a3 : casino.dAmount + casino.balance >= casino.balance; 
+	 a4 :(!(wAmountLTZ) && !(dAmountLTZ));
+   }
+   LTL {
+     progressProperty: G(!(stateStart) || F(stateStop));   		
+   }
+}

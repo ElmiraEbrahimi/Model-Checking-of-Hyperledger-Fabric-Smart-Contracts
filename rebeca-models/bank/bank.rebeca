@@ -1,0 +1,108 @@
+reactiveclass Bank(15){
+
+   knownrebecs {
+     User user1;
+     User user2;		
+	}
+	
+	statevars{
+	  int balance;
+	  int depositLimit;
+	  int withdrawLimit;
+	  int transferLimit;
+	  int[2] dAmount;
+	  int[2] wAmount;
+		
+	}
+	
+	Bank(){
+	  depositLimit = 10000;
+	  withdrawLimit = 4000;
+	  transferLimit = 3000;
+	  balance = 700; 
+	}
+	
+   msgsrv deposit(int amount){
+     if (amount < depositLimit){
+      if(sender == user1){
+	   dAmount[0] = amount;
+	   balance += amount;
+	   user1.receiveMoney(amount);
+      }
+     else if(sender == user2){
+      dAmount[1] = amount;
+	  balance += amount;
+	  user2.receiveMoney(amount);
+      }
+     }
+   }
+   msgsrv withdraw(int amount){
+     if (amount < withdrawLimit && amount > 0){
+      if(sender == user1){
+       wAmount[0] = amount;
+       balance -= amount;
+	   user1.withdrawMoney(amount);
+	   user1.doSomething();
+       }
+      else if(sender == user2){
+       wAmount[1] = amount;
+	   balance -= amount;
+	   user2.withdrawMoney(amount);
+	   user2.doSomething();
+      }
+     }
+   }	
+   msgsrv transfer(int amount){
+     if (amount < transferLimit){
+      if(sender == user1){ 
+       wAmount[0] = amount;
+	   dAmount[1] = amount;
+	   user1.withdrawMoney(amount);
+	   user2.receiveMoney(amount);
+      }
+      else if(sender == user2){ 
+       wAmount[1] = amount;
+	   dAmount[0] = amount;
+	   user2.withdrawMoney(amount);
+	   user1.receiveMoney(amount);
+      }
+     }
+   }
+}	
+   reactiveclass User(10){
+     knownrebecs{
+      Bank bank;
+     }
+     statevars{
+	  int balance;
+     }
+     User(int startBalance){
+      balance = startBalance;
+      self.doSomething();
+     }
+   msgsrv receiveMoney(int value){
+     balance += value;
+	 self.doSomething();
+   }
+   msgsrv withdrawMoney(int value){
+     if(balance >=value ){
+      balance -= value;
+     }
+   }
+   msgsrv doSomething(){
+     int whatToDo = ?(1,2,3);
+     int amount = ?(10,20,30);
+	 if(whatToDo==1)
+      bank.deposit(amount);
+	 else if(whatToDo==2)
+	  bank.withdraw(amount);
+	 else if(whatToDo==3)
+	  bank.transfer(amount);
+   }	
+}
+
+main {
+   Bank bank(user1,user2):();
+   User user1(bank):(400);
+   User user2(bank):(300);
+}

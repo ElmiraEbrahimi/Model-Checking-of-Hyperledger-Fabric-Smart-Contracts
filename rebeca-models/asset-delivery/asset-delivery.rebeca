@@ -1,0 +1,67 @@
+reactiveclass AssetDelivery(5){
+   knownrebecs {
+     Asset asset1;
+	 Asset asset2;
+	 Asset asset3;
+   }
+   statevars{
+     int postBoxA;
+	 int postBoxB;
+   }
+   AssetDelivery(){
+     postBoxA = 1;
+     postBoxB = 2;
+   }
+   msgsrv assetDeliver(int id){
+     self.deliverAssetOfficeA(id);
+   }
+   msgsrv deliverAssetOfficeA(int postalId){
+     if(postalId == postBoxA){
+      asset1.deliverd();
+     } 
+     else{
+      self.deliverAssetOfficeB(postalId);
+     }
+   }
+   msgsrv deliverAssetOfficeB(int postalId){
+     if(postalId == postBoxB){
+      asset2.deliverd();
+     } 
+	 else{
+	  self.deliverAssetOfficeA(postalId);
+     }
+   }
+}
+reactiveclass Asset(5){
+   knownrebecs {
+     AssetDelivery assetDelivery;
+   }
+   statevars{
+     boolean deliverd;
+     int postalId;
+   }
+   Asset(int id){
+     deliverd = false;
+	 postalId = id;
+	 self.sendToOffice(postalId);
+   }
+   msgsrv sendToOffice(int id){
+     assetDelivery.assetDeliver(id);
+   }
+   msgsrv deliverd (){
+     deliverd = true;
+     self.doSomething();
+   }
+   msgsrv doSomething(){
+     int randomPostaId = ?(1,2,3);
+	 assetDelivery.assetDeliver(randomPostaId);
+   }
+}
+
+main{
+   AssetDelivery assetDelivery(asset1,asset2,asset3):();
+   Asset asset1(assetDelivery):(1);
+   Asset asset2(assetDelivery):(2);
+   Asset asset3(assetDelivery):(3);
+}
+	

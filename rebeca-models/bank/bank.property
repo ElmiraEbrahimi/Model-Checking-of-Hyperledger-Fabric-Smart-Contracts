@@ -1,0 +1,17 @@
+property {
+   define{
+     permittedWAUser1 = (bank.wAmount[0] < bank.withdrawLimit);
+	 PermittedWAUser2 = (bank.wAmount[1] < bank.withdrawLimit);
+	 user1Balance = (user1.balance >= 0 );
+	 user2Balance = ( user2.balance >= 0);
+	 equallityofBankBalance = ( bank.balance == user1.balance +user2.balance);
+   }
+   Assertion {
+     b1: bank.balance >= 0;
+	 b2: permittedWAUser1 && PermittedWAUser2;
+	 b3: (user1Balance && user2Balance);    
+   }
+   LTL{
+     safety: F(equallityofBankBalance);
+   }
+}
