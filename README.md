@@ -7,9 +7,9 @@ Conducting interactions between shared-purpose organizations without centralized
   <img src="docs/rebeca_dg.png" width="300">
 </p>
 
-## Prerequisites
+## Requirements
 - Install [Afra 3](https://www.python.org/downloads)
 
-you can learn about Rebeca from its [User Manual](docs%2user_manual.pdf)and find some Rebeca model examples [Here](https://rebeca-lang.org/Rebeca)
+you can learn about Rebeca from its [User Manual](docs%2user_manual.pdf) and find some Rebeca model examples [Here](https://rebeca-lang.org/Rebeca)
 
 
